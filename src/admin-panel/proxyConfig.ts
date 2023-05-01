@@ -5,6 +5,9 @@ const API_BASE_URL = process.env.API_BASE_URL;
 const proxyConfig = createProxyMiddleware({
   target: API_BASE_URL, // specify the URL of the API server
   changeOrigin: true,
+  onProxyReq: function (proxyReq: any, req: any, res: any) {
+    console.log("proxyReq", req.body);
+  },
   //   onProxyReq: function (proxyReq: any, req: any, res: any) {
   //     if (
   //       req.headers["content-type"] &&

@@ -8,9 +8,10 @@ const path = require("path");
 const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const adminPanelProxyConfig = require("./admin-panel/proxyConfig");
+const limiter = require("./utils/rateLimiter");
+const speedLimiter = require("./utils/slowRate");
 const errorHandler = require("./errors/errorHandler");
 const notFound = require("./errors/notFound");
 const app = (0, express_1.default)();
@@ -21,13 +22,9 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet()); // Auto define headers
 app.use(express_1.default.urlencoded({ extended: false })); // use this middleware to handle x-www-form-urlencoded data
-const limiter = rateLimit({
-    windowMs: 5 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
-app.use(prefix, limiter, adminPanelProxyConfig);
+app.use(limiter);
+// app.use(speedLimiter);
+app.use(prefix, adminPanelProxyConfig);
 app.use(notFound);
 app.use(errorHandler);
 module.exports = app;
